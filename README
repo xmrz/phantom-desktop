@@ -1,0 +1,37 @@
+### Build ###
+docker build -t desktop . 
+
+
+### Without TLS ###
+docker run --rm --name=desktop \
+ -p 15900:5900/tcp -p 17000:7000/tcp -p 18000:8000 \
+ -v $HOME/desktop-home:/home/phantom \
+ -d desktop
+
+
+### With TLS ###
+docker run --rm --name=desktop \
+ -p 15900:5900 -p 17000:7000/tcp -p 18000:8000/tcp \
+ -v $HOME/desktop-home:/home/phantom \
+ -e PASSWORD=very_complex_password \
+ -e TLS_CERTIFICATE_CHAIN=/certificate.crt \
+ -e TLS_CERTIFICATE_PRIVATE_KEY=/private_key.pem \
+ -v /tls_config/snakeoil.crt:/certificate.crt \
+ -v /tls_config/snakeoil.pem:/private_key.pem \
+ -d desktop
+
+
+### Stop ###
+docker stop desktop
+
+
+### Restartable ###
+docker run --restart=unless-stopped --name=desktop -p 15900:5900 -p 17000:7000/tcp -p 18000:8000 -e PASSWORD=very_complex_password -d desktop
+docker stop desktop
+docker start desktop
+
+
+### Ephemeral ###
+docker run --rm -p 17000:7000 -d desktop
+
+
