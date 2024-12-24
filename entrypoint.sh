@@ -3,8 +3,10 @@
 sudo mkdir -p "/home/${USERNAME}/.vnc"
 sudo chown -R "${USERNAME}:${USERNAME}" "/home/${USERNAME}"
 touch "/home/${USERNAME}/.Xauthority"
-echo "${PASSWORD}" | vncpasswd -f > "/home/${USERNAME}/.vnc/passwd"
-chmod 0600 "/home/${USERNAME}/.vnc/passwd"
+if test -n "${PASSWORD}"; then
+    echo "${PASSWORD}" | vncpasswd -f > "/home/${USERNAME}/.vnc/passwd"
+    chmod 0600 "/home/${USERNAME}/.vnc/passwd"
+fi;
 
 cd "/home/${USERNAME}"
 if test ! -f "/home/${USERNAME}/.entrypoint_lock"; then
@@ -13,7 +15,11 @@ if test ! -f "/home/${USERNAME}/.entrypoint_lock"; then
 fi;
 nohup python /server.py 1>http_server.log 2>&1 &
 cd -
-vncserver -geometry 1200x800 -localhost no -rfbport 5900 -xstartup /usr/bin/mate-session
+if test -n "${PASSWORD}"; then
+    vncserver -geometry 1200x800 -localhost no -rfbport 5900 -xstartup /usr/bin/mate-session
+else
+    vncserver -SecurityTypes None --I-KNOW-THIS-IS-INSECURE -geometry 1200x800 -localhost no -rfbport 5900 -xstartup /usr/bin/mate-session
+fi;
 
 cd /novnc
 CERT="$TLS_CERTIFICATE_CHAIN"
