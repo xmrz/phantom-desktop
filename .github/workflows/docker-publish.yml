@@ -84,6 +84,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v2.2.0
+        with:
+         cosign-release: 'v2.2.0'
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
       # repository is public to avoid leaking data.  If you would like to publish
